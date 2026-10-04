@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f5f1e8">
+    <title>Cycle Notes | Period tracker</title>
+    <link rel="stylesheet" href="./period-tracker.css">
+</head>
+<body>
+    <header class="topbar">
+        <a class="wordmark" href="#top" aria-label="Cycle Notes home">
+            <span class="wordmark-icon" aria-hidden="true">c</span>
+            <span>cycle notes</span>
+        </a>
+        <span class="privacy-note"><span class="privacy-dot" aria-hidden="true"></span>Private on this device</span>
+    </header>
+
+    <main class="page-shell" id="top">
+        <section class="page-heading" aria-labelledby="page-title">
+            <div>
+                <p class="eyebrow">A little space for you</p>
+                <h1 id="page-title">Your cycle,<br><span>at a glance.</span></h1>
+            </div>
+            <p class="intro-copy">Keep a simple note of your period and see what your cycle might look like next.</p>
+        </section>
+
+        <section class="summary-grid" aria-label="Cycle summary">
+            <article class="summary-item summary-featured">
+                <p class="eyebrow">Next period, estimated</p>
+                <p class="summary-value" id="next-period">Add a start date</p>
+                <p class="summary-caption" id="next-caption">Your estimate will appear here.</p>
+            </article>
+            <article class="summary-item">
+                <p class="eyebrow">Last period started</p>
+                <p class="summary-value" id="last-period">Not yet logged</p>
+                <p class="summary-caption">Based on your most recent entry</p>
+            </article>
+            <article class="summary-item">
+                <p class="eyebrow">Your cycle</p>
+                <p class="summary-value"><span id="cycle-summary">28</span><span class="summary-unit"> days</span></p>
+                <p class="summary-caption">Your saved average length</p>
+            </article>
+        </section>
+
+        <div class="content-grid">
+            <section class="calendar-panel" aria-labelledby="calendar-title">
+                <div class="calendar-heading">
+                    <div>
+                        <p class="eyebrow">Your history</p>
+                        <h2 id="calendar-title" aria-live="polite"></h2>
+                    </div>
+                    <div class="month-controls" aria-label="Calendar navigation">
+                        <button class="icon-button" id="previous-month" type="button" aria-label="Previous month" title="Previous month">‹</button>
+                        <button class="icon-button" id="next-month" type="button" aria-label="Next month" title="Next month">›</button>
+                    </div>
+                </div>
+                <div class="calendar-grid calendar-weekdays" aria-hidden="true">
+                    <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+                </div>
+                <div class="calendar-grid calendar-days" id="calendar-days" role="group" aria-label="Calendar days"></div>
+                <div class="calendar-legend" aria-label="Calendar key">
+                    <span><i class="legend-dot logged-dot" aria-hidden="true"></i>Logged period</span>
+                    <span><i class="legend-dot estimate-dot" aria-hidden="true"></i>Estimated</span>
+                    <span><i class="legend-dot today-dot" aria-hidden="true"></i>Today</span>
+                    <span><i class="legend-dot mood-legend-dot" aria-hidden="true"></i>Mood logged</span>
+                    <span><i class="legend-dot season-winter-dot" aria-hidden="true"></i>Winter · menstruation</span>
+                    <span><i class="legend-dot season-spring-dot" aria-hidden="true"></i>Spring · follicular</span>
+                    <span><i class="legend-dot season-summer-dot" aria-hidden="true"></i>Summer · ovulation</span>
+                    <span><i class="legend-dot season-autumn-dot" aria-hidden="true"></i>Autumn · luteal</span>
+                </div>
+                <p class="calendar-phase-note" id="calendar-phase-note"></p>
+            </section>
+
+            <aside class="tools-column" aria-label="Tracker tools">
+                <section class="tool-panel log-panel" aria-labelledby="log-title">
+                    <p class="eyebrow">Keep a note</p>
+                    <h2 id="log-title">When did it start?</h2>
+                    <p class="panel-copy">Choose the first day of your most recent period.</p>
+                    <form id="period-form">
+                        <label for="period-date">Period start date</label>
+                        <input id="period-date" name="period-date" type="date" required>
+                        <button class="primary-button" type="submit">＋ <span>Log period start</span></button>
+                    </form>
+                    <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+                </section>
+
+                <section class="tool-panel mood-panel" aria-labelledby="mood-title">
+                    <p class="eyebrow">Check in with yourself</p>
+                    <h2 id="mood-title">How did you feel?</h2>
+                    <p class="panel-copy">Pick a day on the calendar or choose a date to add a mood.</p>
+                    <form id="mood-form">
+                        <label for="mood-date">Mood date</label>
+                        <input id="mood-date" name="mood-date" type="date" required>
+                        <fieldset class="mood-options">
+                            <legend>Choose a mood</legend>
+                            <label class="mood-option mood-option-motivated">
+                                <input type="radio" name="mood" value="motivated">
+                                <span>Motivated</span>
+                            </label>
+                            <label class="mood-option mood-option-lazy">
+                                <input type="radio" name="mood" value="lazy">
+                                <span>Lazy</span>
+                            </label>
+                            <label class="mood-option mood-option-emotional">
+                                <input type="radio" name="mood" value="emotional">
+                                <span>Emotional</span>
+                            </label>
+                        </fieldset>
+                        <button class="mood-button" type="submit">Save mood</button>
+                    </form>
+                    <div class="mood-day-summary" id="mood-day-summary" aria-live="polite"></div>
+                    <p class="mood-status" id="mood-status" role="status"></p>
+                </section>
+
+                <section class="tool-panel settings-panel" aria-labelledby="settings-title">
+                    <p class="eyebrow">Make it yours</p>
+                    <h2 id="settings-title">Cycle settings</h2>
+                    <div class="settings-fields">
+                        <div class="setting-field">
+                            <label for="cycle-length">Cycle length</label>
+                            <div class="number-field"><input id="cycle-length" type="number" min="20" max="45" value="28"><span>days</span></div>
+                        </div>
+                        <div class="setting-field">
+                            <label for="period-length">Period length</label>
+                            <div class="number-field"><input id="period-length" type="number" min="1" max="10" value="5"><span>days</span></div>
+                        </div>
+                    </div>
+                    <button class="secondary-button" id="save-settings" type="button">Save settings</button>
+                    <p class="settings-status" id="settings-status" role="status" aria-live="polite"></p>
+                </section>
+            </aside>
+        </div>
+
+        <section class="phase-guide" aria-labelledby="phase-guide-title">
+            <div class="phase-guide-heading">
+                <div>
+                    <p class="eyebrow">Get to know your cycle</p>
+                    <h2 id="phase-guide-title">Four phases, four seasons</h2>
+                </div>
+                <p class="phase-guide-note">A typical 28-day pattern. Your cycle and experience may be different.</p>
+            </div>
+
+            <div class="phase-list">
+                <details class="phase-item">
+                    <summary>
+                        <span class="phase-season winter">Winter</span>
+                        <span class="phase-name">Menstruation</span>
+                        <span class="phase-days">Days 1–5</span>
+                        <span class="phase-toggle" aria-hidden="true">+</span>
+                    </summary>
+                    <div class="phase-details">
+                        <p class="phase-hormones"><strong>Hormones</strong> Estrogen and progesterone are at their lowest.</p>
+                        <div class="phase-facts">
+                            <div><h3>In your body</h3><ul><li>The uterine lining sheds</li><li>Cramps or back pain may happen</li><li>Fatigue or weakness may occur</li></ul></div>
+                            <div><h3>How you might feel</h3><ul><li>A greater need for rest and quiet</li><li>Lower energy</li><li>A sense of emotional release</li></ul></div>
+                        </div>
+                    </div>
+                </details>
+
+                <details class="phase-item">
+                    <summary>
+                        <span class="phase-season spring">Spring</span>
+                        <span class="phase-name">Follicular phase</span>
+                        <span class="phase-days">Days 6–13</span>
+                        <span class="phase-toggle" aria-hidden="true">+</span>
+                    </summary>
+                    <div class="phase-details">
+                        <p class="phase-hormones"><strong>Hormones</strong> Estrogen gradually rises.</p>
+                        <div class="phase-facts">
+                            <div><h3>In your body</h3><ul><li>An egg matures in the ovary</li><li>The uterine lining starts to rebuild</li><li>Your skin may feel clearer or firmer</li></ul></div>
+                            <div><h3>How you might feel</h3><ul><li>Motivation and mental clarity may rise</li><li>More social or creative energy</li><li>A stronger sense of optimism</li></ul></div>
+                        </div>
+                    </div>
+                </details>
+
+                <details class="phase-item">
+                    <summary>
+                        <span class="phase-season summer">Summer</span>
+                        <span class="phase-name">Ovulation</span>
+                        <span class="phase-days">Around day 14</span>
+                        <span class="phase-toggle" aria-hidden="true">+</span>
+                    </summary>
+                    <div class="phase-details">
+                        <p class="phase-hormones"><strong>Hormones</strong> Estrogen peaks and luteinizing hormone (LH) rises.</p>
+                        <div class="phase-facts">
+                            <div><h3>In your body</h3><ul><li>An egg is released from the ovary</li><li>Cervical mucus may become thinner</li><li>Some people feel one-sided mid-cycle pain</li></ul></div>
+                            <div><h3>How you might feel</h3><ul><li>More confident or outgoing</li><li>Energy or libido may increase</li><li>You may feel more attractive</li></ul></div>
+                        </div>
+                    </div>
+                </details>
+
+                <details class="phase-item">
+                    <summary>
+                        <span class="phase-season autumn">Autumn</span>
+                        <span class="phase-name">Luteal phase</span>
+                        <span class="phase-days">Days 15–28</span>
+                        <span class="phase-toggle" aria-hidden="true">+</span>
+                    </summary>
+                    <div class="phase-details">
+                        <p class="phase-hormones"><strong>Hormones</strong> Progesterone is dominant, then falls toward the end.</p>
+                        <div class="phase-facts">
+                            <div><h3>In your body</h3><ul><li>Body temperature may rise slightly</li><li>PMS symptoms, breast tenderness, or fluid retention may occur</li><li>Cravings or bloating may happen</li></ul></div>
+                            <div><h3>How you might feel</h3><ul><li>Physical and mental energy may decrease</li><li>Irritability or mood changes may occur</li><li>You may want to slow down</li></ul></div>
+                        </div>
+                    </div>
+                </details>
+            </div>
+            <p class="phase-disclaimer">These are common experiences, not rules. Cycle timing varies, and phase estimates should not be used as birth control.</p>
+        </section>
+
+        <footer class="page-footer">
+            <p>Cycle dates are estimates, not medical advice or birth control. Your entries stay in this browser.</p>
+            <button class="text-button" id="clear-data" type="button">Clear my data</button>
+        </footer>
+    </main>
+
+    <script>
+        (() => {
+            const storageKey = "cycle-notes-data-v1";
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const todayKey = toDateKey(today);
+            const state = loadState();
+            let visibleMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+            let selectedMoodDate = todayKey;
+
+            const elements = {
+                calendarTitle: document.getElementById("calendar-title"),
+                calendarDays: document.getElementById("calendar-days"),
+                periodDate: document.getElementById("period-date"),
+                formStatus: document.getElementById("form-status"),
+                moodDate: document.getElementById("mood-date"),
+                moodDaySummary: document.getElementById("mood-day-summary"),
+                moodStatus: document.getElementById("mood-status"),
+                cycleLength: document.getElementById("cycle-length"),
+                periodLength: document.getElementById("period-length"),
+                settingsStatus: document.getElementById("settings-status")
+            };
+
+            elements.periodDate.max = todayKey;
+            elements.periodDate.value = todayKey;
+            elements.moodDate.value = todayKey;
+            elements.cycleLength.value = state.cycleLength;
+            elements.periodLength.value = state.periodLength;
+
+            function toDateKey(date) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, "0");
+                const day = String(date.getDate()).padStart(2, "0");
+                return `${year}-${month}-${day}`;
+            }
+
+            function fromDateKey(key) {
+                const [year, month, day] = key.split("-").map(Number);
+                return new Date(year, month - 1, day);
+            }
+
+            function loadState() {
+                try {
+                    const saved = JSON.parse(localStorage.getItem(storageKey));
+                    if (saved && typeof saved === "object") {
+                        return {
+                            starts: Array.isArray(saved.starts) ? [...new Set(saved.starts.filter((key) => /^\d{4}-\d{2}-\d{2}$/.test(key)))].sort() : [],
+                            moods: Array.isArray(saved.moods) ? saved.moods.filter((entry, index, entries) => entry && /^\d{4}-\d{2}-\d{2}$/.test(entry.date) && ["motivated", "lazy", "emotional"].includes(entry.mood) && entries.findIndex((item) => item && item.date === entry.date) === index) : [],
+                            cycleLength: Number.isInteger(saved.cycleLength) && saved.cycleLength >= 20 && saved.cycleLength <= 45 ? saved.cycleLength : 28,
+                            periodLength: Number.isInteger(saved.periodLength) && saved.periodLength >= 1 && saved.periodLength <= 10 ? saved.periodLength : 5
+                        };
+                    }
+                } catch {
+                    // Keep the tracker usable if browser storage is unavailable or invalid.
+                }
+                return { starts: [], moods: [], cycleLength: 28, periodLength: 5 };
+            }
+
+            function saveState() {
+                try {
+                    localStorage.setItem(storageKey, JSON.stringify(state));
+                } catch {
+                    elements.formStatus.textContent = "Could not save in this browser. Check your storage settings.";
+                }
+            }
+
+            function formatDate(date, options = { month: "short", day: "numeric" }) {
+                return new Intl.DateTimeFormat(undefined, options).format(date);
+            }
+
+            function getNextEstimate() {
+                if (state.starts.length === 0) return null;
+                const next = fromDateKey(state.starts[state.starts.length - 1]);
+                next.setDate(next.getDate() + state.cycleLength);
+                while (next < today) next.setDate(next.getDate() + state.cycleLength);
+                return next;
+            }
+
+            function getPhaseForDay(day) {
+                const dayKey = toDateKey(day);
+                let cycleStartKey = null;
+                for (const startKey of state.starts) {
+                    if (startKey > dayKey) break;
+                    cycleStartKey = startKey;
+                }
+                if (!cycleStartKey) return null;
+
+                const daysSinceStart = Math.round((day - fromDateKey(cycleStartKey)) / 86400000);
+                const cycleDay = (daysSinceStart % state.cycleLength) + 1;
+                const ovulationDay = Math.max(6, state.cycleLength - 14);
+                if (cycleDay <= 5) return { season: "winter", phase: "menstruation", cycleDay };
+                if (cycleDay < ovulationDay) return { season: "spring", phase: "follicular phase", cycleDay };
+                if (cycleDay === ovulationDay) return { season: "summer", phase: "ovulation", cycleDay };
+                return { season: "autumn", phase: "luteal phase", cycleDay };
+            }
+
+            function renderSummary() {
+                document.getElementById("cycle-summary").textContent = state.cycleLength;
+                const lastStart = state.starts[state.starts.length - 1];
+                document.getElementById("last-period").textContent = lastStart ? formatDate(fromDateKey(lastStart), { month: "short", day: "numeric", year: "numeric" }) : "Not yet logged";
+                const next = getNextEstimate();
+                document.getElementById("next-period").textContent = next ? formatDate(next, { month: "short", day: "numeric" }) : "Add a start date";
+                if (!next) {
+                    document.getElementById("next-caption").textContent = "Your estimate will appear here.";
+                } else {
+                    const daysAway = Math.round((next - today) / 86400000);
+                    document.getElementById("next-caption").textContent = daysAway === 0 ? "Estimated around today" : `About ${daysAway} day${daysAway === 1 ? "" : "s"} from now`;
+                }
+            }
+
+            function renderCalendar() {
+                const year = visibleMonth.getFullYear();
+                const month = visibleMonth.getMonth();
+                const monthStart = new Date(year, month, 1);
+                const gridStart = new Date(year, month, 1 - monthStart.getDay());
+                const monthEnd = new Date(year, month + 1, 0);
+                const gridEnd = new Date(gridStart);
+                gridEnd.setDate(gridStart.getDate() + 41);
+                elements.calendarTitle.textContent = formatDate(monthStart, { month: "long", year: "numeric" });
+                document.getElementById("calendar-phase-note").textContent = state.starts.length
+                    ? "Season colors are estimates based on your logged period starts and cycle length."
+                    : "Log a period start to see estimated season colors.";
+
+                const loggedDays = new Set();
+                for (const startKey of state.starts) {
+                    const periodStart = fromDateKey(startKey);
+                    for (let offset = 0; offset < state.periodLength; offset += 1) {
+                        const day = new Date(periodStart);
+                        day.setDate(day.getDate() + offset);
+                        loggedDays.add(toDateKey(day));
+                    }
+                }
+
+                const estimatedDays = new Set();
+                const lastStart = state.starts.length ? fromDateKey(state.starts[state.starts.length - 1]) : null;
+                if (lastStart) {
+                    const estimate = new Date(lastStart);
+                    estimate.setDate(estimate.getDate() + state.cycleLength);
+                    while (estimate < gridStart) estimate.setDate(estimate.getDate() + state.cycleLength);
+                    while (estimate <= gridEnd) {
+                        for (let offset = 0; offset < state.periodLength; offset += 1) {
+                            const day = new Date(estimate);
+                            day.setDate(day.getDate() + offset);
+                            estimatedDays.add(toDateKey(day));
+                        }
+                        estimate.setDate(estimate.getDate() + state.cycleLength);
+                    }
+                }
+
+                const fragment = document.createDocumentFragment();
+                for (let offset = 0; offset < 42; offset += 1) {
+                    const day = new Date(gridStart);
+                    day.setDate(gridStart.getDate() + offset);
+                    const key = toDateKey(day);
+                    const isLogged = loggedDays.has(key);
+                    const isEstimated = estimatedDays.has(key) && !isLogged;
+                    const moodEntry = state.moods.find((entry) => entry.date === key);
+                    const phase = getPhaseForDay(day);
+                    const button = document.createElement("button");
+                    button.type = "button";
+                    button.className = "calendar-day";
+                    if (day.getMonth() !== month) button.classList.add("outside-month");
+                    if (isLogged) button.classList.add("logged-day");
+                    if (isEstimated) button.classList.add("estimated-day");
+                    if (phase) button.classList.add(`phase-${phase.season}`);
+                    if (key === todayKey) button.classList.add("today");
+                    if (key === selectedMoodDate) button.classList.add("mood-date-selected");
+                    const dayNumber = document.createElement("span");
+                    dayNumber.className = "calendar-day-number";
+                    dayNumber.textContent = day.getDate();
+                    button.append(dayNumber);
+                    let label = formatDate(day, { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+                    if (isLogged) label += ", logged period";
+                    else if (isEstimated) label += ", estimated period";
+                    if (phase) label += `, ${phase.season} ${phase.phase}, cycle day ${phase.cycleDay}`;
+                    if (moodEntry) {
+                        const moodMarker = document.createElement("span");
+                        moodMarker.className = `calendar-mood-dot mood-${moodEntry.mood}`;
+                        moodMarker.setAttribute("aria-hidden", "true");
+                        button.append(moodMarker);
+                        label += `, mood: ${moodEntry.mood}`;
+                    }
+                    if (key === todayKey) label += ", today";
+                    button.setAttribute("aria-label", label);
+                    button.addEventListener("click", () => {
+                        selectedMoodDate = key;
+                        elements.moodDate.value = key;
+                        elements.moodStatus.textContent = "";
+                        renderCalendar();
+                        renderMoodSummary();
+                    });
+                    fragment.append(button);
+                }
+                elements.calendarDays.replaceChildren(fragment);
+            }
+
+            function renderMoodSummary() {
+                const moodEntry = state.moods.find((entry) => entry.date === selectedMoodDate);
+                document.querySelectorAll('input[name="mood"]').forEach((option) => {
+                    option.checked = Boolean(moodEntry && option.value === moodEntry.mood);
+                });
+                elements.moodDaySummary.replaceChildren();
+                const message = document.createElement("span");
+                message.textContent = moodEntry ? `Saved for ${formatDate(fromDateKey(selectedMoodDate))}: ${moodEntry.mood}.` : `No mood saved for ${formatDate(fromDateKey(selectedMoodDate))}.`;
+                elements.moodDaySummary.append(message);
+                if (moodEntry) {
+                    const removeButton = document.createElement("button");
+                    removeButton.className = "remove-mood-button";
+                    removeButton.type = "button";
+                    removeButton.textContent = "Remove";
+                    removeButton.setAttribute("aria-label", `Remove mood for ${formatDate(fromDateKey(selectedMoodDate))}`);
+                    removeButton.addEventListener("click", () => {
+                        state.moods = state.moods.filter((entry) => entry.date !== selectedMoodDate);
+                        saveState();
+                        elements.moodStatus.textContent = "Mood removed.";
+                        renderCalendar();
+                        renderMoodSummary();
+                    });
+                    elements.moodDaySummary.append(removeButton);
+                }
+            }
+
+            function render() {
+                renderSummary();
+                renderCalendar();
+                renderMoodSummary();
+            }
+
+            elements.moodDate.addEventListener("change", () => {
+                if (!elements.moodDate.value) return;
+                selectedMoodDate = elements.moodDate.value;
+                elements.moodStatus.textContent = "";
+                renderCalendar();
+                renderMoodSummary();
+            });
+
+            document.getElementById("period-form").addEventListener("submit", (event) => {
+                event.preventDefault();
+                const key = elements.periodDate.value;
+                if (!key || key > todayKey) {
+                    elements.formStatus.textContent = "Choose a date that is today or earlier.";
+                    return;
+                }
+                if (state.starts.includes(key)) {
+                    elements.formStatus.textContent = "That start date is already in your calendar.";
+                    return;
+                }
+                state.starts.push(key);
+                state.starts.sort();
+                saveState();
+                elements.formStatus.textContent = `Period start logged for ${formatDate(fromDateKey(key))}.`;
+                visibleMonth = new Date(fromDateKey(key).getFullYear(), fromDateKey(key).getMonth(), 1);
+                render();
+            });
+
+            document.getElementById("mood-form").addEventListener("submit", (event) => {
+                event.preventDefault();
+                const mood = document.querySelector('input[name="mood"]:checked');
+                if (!elements.moodDate.value || !mood) {
+                    elements.moodStatus.textContent = "Choose a date and a mood first.";
+                    return;
+                }
+                selectedMoodDate = elements.moodDate.value;
+                const existingMood = state.moods.find((entry) => entry.date === selectedMoodDate);
+                if (existingMood) existingMood.mood = mood.value;
+                else state.moods.push({ date: selectedMoodDate, mood: mood.value });
+                saveState();
+                elements.moodStatus.textContent = `Mood saved for ${formatDate(fromDateKey(selectedMoodDate))}.`;
+                renderCalendar();
+                renderMoodSummary();
+            });
+
+            document.getElementById("save-settings").addEventListener("click", () => {
+                const cycleLength = Number(elements.cycleLength.value);
+                const periodLength = Number(elements.periodLength.value);
+                if (!Number.isInteger(cycleLength) || cycleLength < 20 || cycleLength > 45 || !Number.isInteger(periodLength) || periodLength < 1 || periodLength > 10) {
+                    elements.settingsStatus.textContent = "Choose a cycle of 20–45 days and a period of 1–10 days.";
+                    return;
+                }
+                state.cycleLength = cycleLength;
+                state.periodLength = periodLength;
+                saveState();
+                elements.settingsStatus.textContent = "Settings saved.";
+                render();
+            });
+
+            document.getElementById("previous-month").addEventListener("click", () => {
+                visibleMonth = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth() - 1, 1);
+                renderCalendar();
+            });
+            document.getElementById("next-month").addEventListener("click", () => {
+                visibleMonth = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth() + 1, 1);
+                renderCalendar();
+            });
+            document.getElementById("clear-data").addEventListener("click", () => {
+                if (!window.confirm("Clear all period dates, moods, and settings saved in this browser?")) return;
+                state.starts = [];
+                state.moods = [];
+                state.cycleLength = 28;
+                state.periodLength = 5;
+                elements.cycleLength.value = 28;
+                elements.periodLength.value = 5;
+                elements.formStatus.textContent = "Your period dates have been cleared.";
+                elements.moodStatus.textContent = "Your mood notes have been cleared.";
+                elements.settingsStatus.textContent = "";
+                saveState();
+                render();
+            });
+
+            render();
+        })();
+    </script>
+</body>
+</html>
